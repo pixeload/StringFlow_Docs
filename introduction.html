@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction — StringFlow Documentation</title>
+<meta name="description" content="What StringFlow is and how its three tools fit together.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html" class="current">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">StringFlow Documentation</p>
+  <h1>Localization for Unity, without leaving the Editor</h1>
+  <p class="lede">
+    StringFlow is three tools that share one job: get every string in your project into
+    Unity's Localization Tables, and get every table translated, without a spreadsheet
+    round-trip or a cloud account. This site documents all three, end to end.
+  </p>
+</div>
+
+<h2>The three tools</h2>
+<p>
+  Each tool does one part of the job and hands off to the next. You can use any of them on
+  their own — <strong>StringFlow Tables</strong> works with no server at all — but together
+  they cover the whole path from a hardcoded string in a scene to a fully translated build.
+</p>
+
+<div class="card-grid">
+  <a class="card" href="stringflow-tables.html">
+    <h3>StringFlow Tables</h3>
+    <p>Finds hardcoded and unlinked text across your scenes and prefabs, and keeps your String Table Collections clean — duplicates, unused keys, coverage gaps.</p>
+  </a>
+  <a class="card" href="stringflow-translate.html">
+    <h3>StringFlow Translate</h3>
+    <p>Fills in empty cells in a String Table using a local machine-translation server. Never overwrites an existing translation.</p>
+  </a>
+  <a class="card" href="environment-setup.html">
+    <h3>StringFlow Environment Setup</h3>
+    <p>Installs and manages the translation server(s) StringFlow Translate talks to, running in Docker on your own machine.</p>
+  </a>
+</div>
+
+<h2>Where StringFlow's data lives</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>What</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td>Your actual localized text</td><td>Unity's own String Table Collection assets, exactly as the Localization package stores them — StringFlow never invents its own text format.</td></tr>
+      <tr><td>Backend list, routing rules, language-code maps</td><td><code>Assets/.../LibreTranslate/Data/TranslationEngineConfig.asset</code> — a normal project asset, safe to commit.</td></tr>
+      <tr><td>Translation run history</td><td><code>&lt;project&gt;/TranslationHistory/history.jsonl</code>, next to <code>Assets/</code> — plain-text log, one JSON line per run. Not a Unity asset, so it survives even a corrupted Library folder.</td></tr>
+      <tr><td>Docker containers &amp; downloaded models</td><td>Docker's own storage on your machine — nothing Unity-side, nothing in your project.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Where it runs</h2>
+<p>
+  StringFlow Translate and StringFlow Environment Setup talk to a translation server running
+  <strong>on your own computer</strong>, inside Docker. There is no cloud account, no API key,
+  and no per-word billing — the trade-off is that the first setup downloads a few gigabytes of
+  server and language-model files, once. StringFlow Tables needs no server at all; it only
+  reads and edits your project.
+</p>
+
+<div class="callout">
+  <p class="callout-label">Privacy</p>
+  <p>
+    Nothing your project contains — table names, strings, translations — leaves your machine
+    through StringFlow itself. The translation server is a process on your own computer,
+    reached over <code>localhost</code>.
+  </p>
+</div>
+
+<h2>Before you read on</h2>
+<p>
+  This site assumes you already have a Unity project with Unity's own
+  <strong>Localization package</strong> (<code>com.unity.localization</code>) installed, and at
+  least one String Table Collection with a couple of Locales. If you don't yet, the
+  <a href="getting-started.html">Getting Started</a> page covers that first.
+</p>
+
+<div class="page-nav">
+  <a href="index.html"><span class="dir">&larr; Previous</span><span class="label">Home</span></a>
+  <a href="getting-started.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Getting Started</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

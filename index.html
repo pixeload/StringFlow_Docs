@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StringFlow — Localization Tools for Unity</title>
+<meta name="description" content="Find every string, connect a translator, and ship every language — three tools, one workflow, entirely on your own machine.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html" class="current">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content wide">
+<section class="hero reveal">
+  <img class="hero-logo" src="assets/logo.png" alt="StringFlow logo">
+  <span class="hero-badge"><span class="dot-live"></span> Runs entirely on your machine — no account, no API key</span>
+  <h1>Every string found.<br>Every language filled in.<br>Without leaving Unity.</h1>
+  <p class="lede">
+    StringFlow is three tools that share one job: get every piece of text in your project into
+    Unity's own Localization Tables, then get every table translated — using a machine-translation
+    server that runs on your own computer, not someone else's cloud.
+  </p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="getting-started.html">Get Started →</a>
+    <a class="btn btn-secondary" href="introduction.html">Read the Docs</a>
+  </div>
+  <div class="hero-trust">
+    <span>No cloud account</span>
+    <span>No per-word billing</span>
+    <span>Works offline once set up</span>
+    <span>Never overwrites your work</span>
+  </div>
+
+  <div class="mock-panel">
+    <div class="mock-titlebar">
+      <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+      <span style="margin-left:0.4rem;">Tools ▸ StringFlow ▸ StringFlow Environment Setup</span>
+    </div>
+    <div class="mock-row">
+      <span class="mdot g">✓</span>
+      <span class="mname">LibreTranslate</span>
+      <span class="mstatus">Ready — 50 languages</span>
+    </div>
+    <div class="mock-row">
+      <span class="mdot b">⟳</span>
+      <span class="mname">StringFlow Tables</span>
+      <span class="mstatus">1,204 objects scanned · 96% localized</span>
+    </div>
+    <div class="mock-row">
+      <span class="mdot a">⚠</span>
+      <span class="mname">te, ja, ko</span>
+      <span class="mstatus">3 locales still missing translations</span>
+    </div>
+  </div>
+</section>
+
+<section class="home-section reveal">
+  <div class="section-head">
+    <h2>One workflow, three tools</h2>
+    <p>Each does one part of the job and hands off cleanly to the next. Use any of them alone, or run all three back to back.</p>
+  </div>
+  <div class="tool-flow">
+    <a class="tool-card" href="stringflow-tables.html">
+      <span class="tool-step">STEP 1</span>
+      <span class="tool-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z"/><path d="m20 20-4.35-4.35"/></svg>
+      </span>
+      <h3>StringFlow Tables</h3>
+      <p>Finds hardcoded text across every scene and prefab, links it to a table, and audits coverage, duplicates, and unused keys.</p>
+      <span class="go">Explore StringFlow Tables →</span>
+    </a>
+    <a class="tool-card" href="stringflow-translate.html">
+      <span class="tool-step">STEP 2</span>
+      <span class="tool-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M8 5v3M12 5v14M5 12h5M9 19c3-1 6-4 6-9"/></svg>
+      </span>
+      <h3>StringFlow Translate</h3>
+      <p>Fills every empty cell using a local machine-translation server. Never overwrites a value that's already there.</p>
+      <span class="go">Explore StringFlow Translate →</span>
+    </a>
+    <a class="tool-card" href="environment-setup.html">
+      <span class="tool-step">STEP 0</span>
+      <span class="tool-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+      </span>
+      <h3>StringFlow Environment Setup</h3>
+      <p>Installs and runs the translation server(s) in Docker on your machine, with one-click repair when something breaks.</p>
+      <span class="go">Explore Environment Setup →</span>
+    </a>
+  </div>
+</section>
+
+<section class="home-section reveal">
+  <div class="section-head">
+    <h2>Built for "it's my machine, my project, my rules"</h2>
+    <p>No dashboard to sign into, no usage meter to watch, no string of your game's dialogue ever leaving your computer.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-tile">
+      <span class="num">0</span>
+      <h3>Accounts required</h3>
+      <p>The translation server is a process on your own machine, reached over <code>localhost</code>. Nothing to sign up for.</p>
+    </div>
+    <div class="feature-tile">
+      <span class="num">50+</span>
+      <h3>Languages, out of the box</h3>
+      <p>LibreTranslate covers ~50 languages after one free setup. An optional second engine extends that further.</p>
+    </div>
+    <div class="feature-tile">
+      <span class="num">1</span>
+      <h3>Rule that never breaks</h3>
+      <p>Translate only ever fills <em>empty</em> cells. Re-running a pass is always safe — nothing you or a human translator wrote is ever replaced.</p>
+    </div>
+    <div class="feature-tile">
+      <span class="num">A→Z</span>
+      <h3>Open by design</h3>
+      <p>Any server that speaks a small REST contract plugs in the same way LibreTranslate does — bring your own translation backend.</p>
+    </div>
+  </div>
+</section>
+
+<section class="home-section reveal">
+  <div class="cta-band">
+    <h2>Start with your first table</h2>
+    <p>
+      Install Docker, run the setup wizard once, and translate a real String Table Collection in
+      under an hour — most of that is one unattended download.
+    </p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="getting-started.html">Get Started →</a>
+      <a class="btn btn-secondary" href="troubleshooting.html">Troubleshooting</a>
+    </div>
+  </div>
+</section>
+
+<div class="page-nav">
+  <span></span>
+  <a href="introduction.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Introduction</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

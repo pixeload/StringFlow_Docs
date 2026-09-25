@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connecting Custom Backends — StringFlow Documentation</title>
+<meta name="description" content="The REST contract StringFlow speaks, and how to point it at a server of your own.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html" class="current">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">Going Further</p>
+  <h1>Connecting Custom Backends</h1>
+  <p class="lede">
+    StringFlow Translate doesn't hardcode LibreTranslate or NLLB into how it talks over the
+    network — both speak the same small REST contract, and any server that speaks it plugs in
+    exactly the same way, with no code changes. This page is that contract, and how to wire a
+    new backend into StringFlow once you have one.
+  </p>
+</div>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#contract">The REST contract</a></li>
+    <li><a href="#adding">Adding a backend in the UI</a></li>
+    <li><a href="#language-codes">Language code maps</a></li>
+    <li><a href="#routing">Routing: rules, priority, and learning</a></li>
+    <li><a href="#lifecycle">Optional: teaching Environment Setup to manage it</a></li>
+    <li><a href="#reference-server">Minimal reference server</a></li>
+  </ul>
+</div>
+
+<h2 id="contract">The REST contract</h2>
+<p>
+  This is the entire interface. Implement these two endpoints and StringFlow can use your
+  server exactly as it uses LibreTranslate or NLLB — as a fallback candidate, a rule target,
+  or the only backend you have.
+</p>
+
+<h3>POST /translate</h3>
+<p class="code-label">Request (single string)</p>
+<pre><code>{
+  "q": "Hello, world",
+  "source": "en",
+  "target": "hi",
+  "format": "text"
+}</code></pre>
+<p class="code-label">Response</p>
+<pre><code>{ "translatedText": "नमस्ते, दुनिया" }</code></pre>
+
+<p>
+  <strong>Batched form</strong> — StringFlow sends this automatically whenever it has 2+
+  strings to translate in the same request, to cut down on round-trips. Your server can ignore
+  this entirely and only support the single-string shape above; StringFlow detects that from
+  the response shape and falls back to one request per string for the rest of the run.
+</p>
+<p class="code-label">Batched request</p>
+<pre><code>{
+  "q": ["Hello", "Goodbye", "Thank you"],
+  "source": "en",
+  "target": "hi",
+  "format": "text"
+}</code></pre>
+<p class="code-label">Batched response — same order as the request's "q"</p>
+<pre><code>{ "translatedText": ["नमस्ते", "अलविदा", "धन्यवाद"] }</code></pre>
+
+<p class="code-label">Error response (any non-2xx status)</p>
+<pre><code>{ "error": "a human-readable message" }</code></pre>
+
+<h3>GET /languages</h3>
+<p>
+  Advertises what your server can translate, and — critically for LibreTranslate-style
+  backends — is what StringFlow uses to discover languages <strong>live</strong> rather than
+  from a hardcoded list, so a server that adds a language later needs no update on the Unity
+  side at all.
+</p>
+<pre><code>[
+  {
+    "code": "en",
+    "name": "English",
+    "targets": ["hi", "ja", "fr", "es"]
+  },
+  {
+    "code": "hi",
+    "name": "Hindi",
+    "targets": ["en"]
+  }
+]</code></pre>
+<p>
+  <code>targets</code> matters: StringFlow checks it per source language rather than assuming
+  every language in the list can translate into every other one, since real MT servers rarely
+  have every directional pair.
+</p>
+
+<h2 id="adding">Adding a backend in the UI</h2>
+<ol class="steps">
+  <li>
+    Open <span class="path">Tools ▸ StringFlow ▸ StringFlow Translate</span> and press
+    <span class="ui">Configure Routing…</span> to open <strong>StringFlow Routing</strong>.
+  </li>
+  <li>
+    Under <strong>Backends</strong>, press <span class="ui">Add Backend</span>. You get a new
+    entry named <em>New Backend</em>, disabled, pointed at
+    <code>http://localhost:5003</code> — a placeholder, not a real default.
+  </li>
+  <li>
+    Set its real <strong>URL</strong>, then press <span class="ui">Test</span>. A green result
+    means <code>GET /languages</code> answered successfully.
+  </li>
+  <li>
+    Tick it on to enable it. Nothing else is required for a backend that speaks LibreTranslate's
+    exact language codes (bare ISO codes like <code>en</code>, <code>hi</code>, <code>ja</code>) —
+    StringFlow discovers what it supports from <code>GET /languages</code> automatically, the
+    same way it does for LibreTranslate itself.
+  </li>
+</ol>
+
+<h2 id="language-codes">Language code maps</h2>
+<p>
+  Only needed if your server's language codes <strong>aren't</strong> discoverable this way, or
+  use a different scheme than Unity's own Locale codes — the way NLLB uses FLORES-200 codes
+  like <code>tel_Telu</code> for Telugu instead of Unity's <code>te</code>.
+</p>
+<p>
+  In <strong>StringFlow Routing</strong>, scroll to your backend's language map section and add
+  entries: a Unity locale code on one side (<code>te</code>), your server's own code for that
+  language on the other (<code>tel_Telu</code>). A locale with no entry simply isn't attempted
+  on that backend — never a hard failure, since the router tries the next candidate in the
+  fallback chain instead. So this map never needs to be exhaustive; add languages to it as you
+  actually need them.
+</p>
+
+<h2 id="routing">Routing: rules, priority, and learning</h2>
+<p>StringFlow decides which backend handles a given (source, target) pair in this order:</p>
+<ol class="steps">
+  <li>
+    <strong>Rules.</strong> An ordered list of <em>source → target → backend</em> — either side
+    can be <code>*</code> to match anything. Evaluated top to bottom; the first enabled match
+    wins that pair's preferred backend. Add one with <span class="ui">Add Rule</span> in
+    StringFlow Routing.
+  </li>
+  <li>
+    <strong>Dynamic Routing</strong> (if enabled). The backend that most recently
+    <em>actually succeeded</em> for that exact pair, remembered automatically — gets faster
+    the more you translate, and never needs configuring by hand.
+  </li>
+  <li>
+    <strong>The fallback order</strong> — the reorderable priority list shown in both StringFlow
+    Translate and StringFlow Routing (drag, or use ▲ / ▼).
+  </li>
+</ol>
+<p>
+  At every level, this is a <em>preference</em>, not an exclusive assignment. If the preferred
+  backend can't actually serve a pair — disabled, no language code, or a genuine failure at
+  translate time — StringFlow keeps walking the rest of the fallback order rather than treating
+  that as the job's final answer. A job only actually fails once every candidate has been tried.
+</p>
+
+<h2 id="lifecycle">Optional: teaching Environment Setup to manage it</h2>
+<p>
+  A backend added through <span class="ui">Add Backend</span> is what StringFlow calls
+  <strong>manually managed</strong>: StringFlow Environment Setup will health-check its URL
+  (so it still shows up as Ready/Not answering there), but it will never install, start, stop,
+  or otherwise touch it — that server is entirely yours to run.
+</p>
+<p>
+  Making Environment Setup able to install and run your backend too — the way it does for
+  LibreTranslate and NLLB — means your server needs to run in Docker and be editable as project
+  data, which isn't exposed through the UI; it's a small code-level addition (a
+  <code>DockerImagePull</code> or <code>DockerBuildBundled</code> backend definition). If you
+  need this, it's a reasonable ask for support — the underlying design already treats every
+  backend generically, so this was built to be extended.
+</p>
+
+<h2 id="reference-server">Minimal reference server</h2>
+<p>
+  A working, dependency-light example — enough to test the contract against, or use as a
+  starting point. Python, no framework beyond the standard library:
+</p>
+<pre><code>from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
+
+LANGUAGES = [
+    {"code": "en", "name": "English", "targets": ["hi"]},
+    {"code": "hi", "name": "Hindi", "targets": ["en"]},
+]
+
+class Handler(BaseHTTPRequestHandler):
+    def _send_json(self, obj, status=200):
+        body = json.dumps(obj).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        if self.path == "/languages":
+            self._send_json(LANGUAGES)
+        else:
+            self._send_json({"error": "not found"}, 404)
+
+    def do_POST(self):
+        if self.path != "/translate":
+            self._send_json({"error": "not found"}, 404)
+            return
+        length = int(self.headers.get("Content-Length", 0))
+        req = json.loads(self.rfile.read(length))
+
+        # Replace this with a real translator. This stub just tags the input
+        # so you can see the round-trip is working end to end.
+        def fake_translate(text):
+            return f"[{req['target']}] {text}"
+
+        if isinstance(req["q"], list):
+            self._send_json({"translatedText": [fake_translate(s) for s in req["q"]]})
+        else:
+            self._send_json({"translatedText": fake_translate(req["q"])})
+
+if __name__ == "__main__":
+    HTTPServer(("0.0.0.0", 5003), Handler).serve_forever()</code></pre>
+<p>
+  Run it, add it in <strong>StringFlow Routing</strong> pointed at
+  <code>http://localhost:5003</code>, press <span class="ui">Test</span> — a green result
+  means the contract is satisfied and StringFlow can already route work to it.
+</p>
+
+<div class="page-nav">
+  <a href="manual-setup.html"><span class="dir">&larr; Previous</span><span class="label">Manual Setup</span></a>
+  <a href="licensing.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Licensing</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

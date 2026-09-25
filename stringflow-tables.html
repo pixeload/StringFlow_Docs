@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StringFlow Tables — StringFlow Documentation</title>
+<meta name="description" content="Find, audit, and clean up every localized string in your project.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html" class="current">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">The Three Tools</p>
+  <h1>StringFlow Tables</h1>
+  <p class="lede">
+    Finds text sitting in your scenes and prefabs that isn't going through Unity's
+    Localization system yet, links it to a String Table, and keeps your tables clean as the
+    project grows. Needs no server, no Docker, and no network — it only reads and writes your
+    project's own assets.
+  </p>
+</div>
+
+<p>Open it from <span class="path">Tools ▸ StringFlow ▸ StringFlow Tables</span>.</p>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#scanning">Scanning your project</a></li>
+    <li><a href="#scan-vs-refresh">Scan vs. Refresh</a></li>
+    <li><a href="#filtering">Filtering and selecting results</a></li>
+    <li><a href="#statuses">Every status, in full</a></li>
+    <li><a href="#details">The Details panel</a></li>
+    <li><a href="#binding">Binding text to a key</a></li>
+    <li><a href="#change-table">Change Table</a></li>
+    <li><a href="#unbind">Unbind</a></li>
+    <li><a href="#prefabs">Prefab instances and overrides</a></li>
+    <li><a href="#repair">Automatic repair suggestions</a></li>
+    <li><a href="#preview">The Preview / Apply window</a></li>
+    <li><a href="#coverage">Coverage</a></li>
+    <li><a href="#duplicates">Find Duplicate Text</a></li>
+    <li><a href="#unused">Find Unused Keys</a></li>
+    <li><a href="#clear">Clear Values</a></li>
+  </ul>
+</div>
+
+<h2 id="scanning">Scanning your project</h2>
+<p>
+  Choose a scope from the dropdown on the left of the toolbar, then press <span class="ui">Scan</span>.
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Scope</th><th>What it covers</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Current Scene</strong></td><td>Only the scene open right now. The fastest option, good for iterating on one screen.</td></tr>
+      <tr><td><strong>Selected Scene</strong></td><td>A scene you pick, without opening it.</td></tr>
+      <tr><td><strong>Selected Prefabs</strong></td><td>Whatever prefab assets you have selected in the Project window.</td></tr>
+      <tr><td><strong>All Scenes</strong></td><td>Every scene asset in the project, whether or not it's in Build Settings.</td></tr>
+      <tr><td><strong>Build Settings Scenes</strong></td><td>Only the scenes actually included in your build.</td></tr>
+      <tr><td><strong>Entire Project</strong></td><td>Every scene and every prefab. The most thorough option — and the slowest on a large project.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The scan looks for text-bearing components — TextMeshPro (<code>TMP</code>) and Unity UI's
+  legacy <code>Text</code> — on every GameObject in scope, whether or not they already have a
+  <code>Localize String Event</code> (<code>LSE</code>) component attached. A progress bar with
+  its own <span class="ui">Cancel</span> appears for anything large enough to take a moment;
+  whatever finished scanning before you cancel is kept.
+</p>
+
+<h2 id="scan-vs-refresh">Scan vs. Refresh — the distinction that matters most</h2>
+<p>
+  The toolbar has <strong>two</strong> buttons that look similar and behave differently. Getting
+  this backwards is the single most common cause of "I made a change and nothing here reflects
+  it":
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Button</th><th>What it actually does</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="ui">Scan</span></td>
+        <td>
+          Scans using the current mode, but <strong>reuses cached results for anything
+          unchanged since the last scan</strong> — fast, but it can miss a change that happened
+          outside this window (in another Unity tool, a script, or by hand-editing a table)
+          if that change didn't touch the objects StringFlow Tables is tracking.
+        </td>
+      </tr>
+      <tr>
+        <td><span class="ui">Refresh</span></td>
+        <td>
+          Re-scans <strong>everything from scratch, ignoring the cache entirely</strong>.
+          Slower, but guaranteed current. Use this whenever you're not sure the list in front of
+          you reflects reality — right after using StringFlow Translate, StringFlow Tables'
+          own auxiliary windows, or Unity's native Localization Tables window.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="callout warn">
+  <p class="callout-label">⚠ If something looks stale</p>
+  <p>
+    Press <span class="ui">Refresh</span>, not <span class="ui">Scan</span> — that's the button
+    that actually discards cached state. If a window is still showing old data after that,
+    closing and reopening it forces a completely fresh read as well, which covers the rare case
+    of a window's own in-memory state (not just the scan cache) having drifted from the project.
+  </p>
+</div>
+
+<h2 id="filtering">Filtering and selecting results</h2>
+<p>The status filter column on the left doubles as a live count and a toggle:</p>
+<ul>
+  <li><span class="ui">All</span> — every scanned text object.</li>
+  <li><span class="ui">Localized</span> — bound, resolves to a real table and key, and is wired to update its text.</li>
+  <li><span class="ui">Unlocalized</span> — no localization binding at all yet.</li>
+  <li><span class="ui">Broken</span> — the referenced table doesn't resolve (deleted or renamed collection), or the reference itself is invalid.</li>
+  <li><span class="ui">Missing Key</span> — the table resolves, but the key it references doesn't exist in it.</li>
+  <li><span class="ui">Empty</span> — an LSE is present but its reference is empty.</li>
+</ul>
+<p>Above the results list, a free-text search filters by GameObject name and current text, and a selection toolbar operates on whatever the filter/search currently shows:</p>
+<ul>
+  <li><span class="ui">Select All</span> — every row matching the current filter and search.</li>
+  <li><span class="ui">Deselect All</span> — clears the selection.</li>
+  <li><span class="ui">Invert</span> — swaps selected and unselected, within the current filter/search.</li>
+</ul>
+<p>
+  If any objects are Unlocalized, an <span class="ui">Auto Bind All (N)</span> button appears
+  next to the filters — it selects every one of them in one click and opens the
+  <a href="#binding">Bind</a> panel immediately, skipping the manual select-then-click-Bind
+  step for the common case of "just localize everything unlocalized."
+</p>
+
+<h3>Reading a result row</h3>
+<p>Each row shows, left to right: a status icon, the scene or prefab it lives in, the GameObject's name, a component badge (<code>TMP</code> or <code>Text</code>), a truncated preview of its current on-screen text, and — once bound — its resolved <code>Table/Key</code>.</p>
+
+<h2 id="statuses">Every status, in full</h2>
+<p>
+  The filter dropdown covers the six you'll see day to day, but the scanner actually tracks
+  eight distinct outcomes internally. The extra two don't have their own filter bucket — they
+  only show up under <span class="ui">All</span> — but they're worth knowing about, because
+  they represent a real, specific problem each:
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Localized</strong></td><td>Bound, resolves to a real table and key, and is actively wired to update a recognized text component. Nothing to do.</td></tr>
+      <tr><td><strong>Unlocalized</strong></td><td>A recognized text component with no localization binding at all yet.</td></tr>
+      <tr><td><strong>Broken Binding</strong></td><td>The table this binding points at no longer exists — deleted or renamed collection. Shown under the <span class="ui">Broken</span> filter.</td></tr>
+      <tr><td><strong>Invalid Reference</strong></td><td>The reference itself is malformed in a way that isn't specifically a missing table or key. Also shown under <span class="ui">Broken</span>.</td></tr>
+      <tr><td><strong>Missing Key</strong></td><td>The table resolves fine, but the specific key it references doesn't exist in it any more — usually a key renamed or deleted directly in the Table window.</td></tr>
+      <tr><td><strong>Empty Binding</strong></td><td>An LSE component exists, but its table/key reference is empty — never actually pointed anywhere.</td></tr>
+      <tr>
+        <td><strong>Disconnected</strong> <span style="color:var(--muted);font-weight:400;">(no dedicated filter)</span></td>
+        <td>The binding is completely valid — real table, real key — but the LSE's own update event has <strong>zero listeners</strong>. It resolves cleanly and will never be flagged as broken, but it also isn't wired to update anything's text on screen. Easy to miss because it looks fine at a glance; only visible under <span class="ui">All</span>.</td>
+      </tr>
+      <tr>
+        <td><strong>Needs Review</strong> <span style="color:var(--muted);font-weight:400;">(no dedicated filter)</span></td>
+        <td>Valid binding with at least one listener, but none of them are a <code>TMP_Text</code> or legacy <code>Text</code> component the scanner can verify — it's wired to <em>something</em>, just not something this tool can confirm is a text display. Worth a manual look. Only visible under <span class="ui">All</span>.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  In practice: if a count in <span class="ui">All</span> is higher than
+  <span class="ui">Localized</span> + <span class="ui">Unlocalized</span> + <span class="ui">Broken</span>
+  + <span class="ui">Missing Key</span> + <span class="ui">Empty</span> added together, the
+  difference is Disconnected and/or Needs Review rows — switch to <span class="ui">All</span>
+  and look at each row's status text (hover the icon) to find them.
+</p>
+
+<h2 id="details">The Details panel</h2>
+<p>
+  Selecting one or more rows populates the Details panel below the list. With a single row
+  selected, it shows the GameObject name, its scene/prefab location, its full hierarchy path,
+  its component type, its current text, its full status (including the specific detail message
+  for anything not cleanly Localized), and — once bound — its table, key, and how many other
+  objects in the <em>current scan</em> reference that same table/key. With multiple rows
+  selected, it instead shows a one-line breakdown (localized / unlocalized / broken counts) and
+  batch versions of the same action buttons.
+</p>
+<p>
+  There's deliberately no "pick any key for this one object" button anywhere in this tool —
+  that's exactly what the Inspector's own <code>LocalizedString</code> field picker already
+  does, and duplicating it here would just be a second way to do the same thing.
+</p>
+
+<h2 id="binding">Binding text to a key</h2>
+<p>
+  Available for Unlocalized rows, as <span class="ui">Bind</span> (single row) or
+  <span class="ui">Batch Bind (N)</span> (multi-select). Set:
+</p>
+<ul>
+  <li><strong>Source Locale</strong> — the language the object's current on-screen text is written in; its value is written into the new key under this locale.</li>
+  <li><strong>Target Table</strong> — which String Table Collection the key is created in (or looked up from, if a matching one already exists).</li>
+  <li>
+    <strong>Key Mode</strong> —
+    <span class="ui">Share Key for Matching Text</span> gives every selected object with
+    identical current text one shared key (fewer keys, but two objects that happen to say the
+    same thing right now will always update together afterward), or
+    <span class="ui">Unique Key per Object</span> gives every object its own key regardless of
+    matching text — the safer default when several objects share default placeholder text
+    (several buttons all saying "Button", for instance) that shouldn't be tied together.
+  </li>
+</ul>
+<p>Press <span class="ui">Preview…</span> to open the shared <a href="#preview">Preview / Apply window</a> before anything is written.</p>
+
+<h2 id="change-table">Change Table</h2>
+<p>
+  Available for already-bound rows. Moves the selected objects' keys to a different String
+  Table Collection, copying every locale's existing value across automatically. Pick the
+  <strong>Destination Table</strong>, then <span class="ui">Preview…</span> the move before
+  applying it.
+</p>
+
+<h2 id="unbind">Unbind</h2>
+<p>
+  Removes the localization component from selected bound objects. The object's <em>current
+  on-screen text is preserved exactly as-is</em> — unbinding never blanks anything, it just
+  stops that object being driven by a table. Batch unbinding shows one confirmation regardless
+  of how many objects are involved, and is undoable via <kbd>Ctrl+Z</kbd>.
+</p>
+
+<h2 id="prefabs">Prefab instances and overrides</h2>
+<p>
+  Selecting a prefab instance whose localization binding has been overridden away from its
+  prefab source shows a dedicated notice with two choices:
+</p>
+<ul>
+  <li>
+    <strong>Match Prefab Binding</strong> — discards this instance's override so it goes back
+    to matching the prefab. Never modifies the prefab asset itself.
+    <span style="color:var(--danger-ink);"> Not undoable via <kbd>Ctrl+Z</kbd>.</span>
+  </li>
+  <li>
+    <strong>Keep Scene Override</strong> — leaves the instance exactly as it is; simply
+    dismisses the notice for now (it reappears the next time you select this row, since the
+    override genuinely still exists — nothing is silently remembered as "already handled").
+  </li>
+</ul>
+
+<h2 id="repair">Automatic repair suggestions</h2>
+<p>
+  Selecting a row with a broken-like status (Broken Binding, Missing Key, or Invalid Reference)
+  shows a <strong>Repair</strong> section underneath, offering whichever of these three
+  automatic fixes actually apply — highest confidence first:
+</p>
+<ol class="steps">
+  <li>
+    <strong>Use "Table/Key" (same text)</strong>
+    Another object elsewhere in the current scan already localizes the <em>exact same
+    current text</em> under a real key. This is the highest-confidence fix available, since it
+    means the correct key almost certainly already exists — it just repoints this object at it.
+  </li>
+  <li>
+    <strong>Use "Key" (closest key name, N edits)</strong>
+    Shown only when the broken reference is by name and a very similarly-named key exists in
+    the same table (within 3 character edits) — the classic signature of a key that was
+    renamed or typo'd. The suggestion names the exact edit distance so you can judge for
+    yourself whether it's really the same key.
+  </li>
+  <li>
+    <strong>Create Missing Key Here</strong>
+    Only for Missing Key rows: creates the exact key this binding was already pointing at, in
+    its current table, left empty. Fill it in afterward via Unity's Table window or
+    <a href="stringflow-translate.html">StringFlow Translate</a>.
+  </li>
+</ol>
+<p>
+  If none of these apply, the panel says so plainly and points you at fixing the binding
+  directly in the Inspector, or using <span class="ui">Unbind</span> — there's no generic
+  "pick a key" escape hatch here either, for the same reason as above.
+</p>
+<p>
+  Selecting multiple broken-like rows at once shows a single <span class="ui">Repair (N)</span>
+  button instead, which builds one combined preview covering the best fix for every row in the
+  selection.
+</p>
+
+<h2 id="preview">The Preview / Apply window</h2>
+<p>
+  Bind, Change Table, and Repair all funnel through the <strong>same</strong> preview window
+  rather than each having its own dialog. It always shows a summary line first — total objects,
+  unique strings, existing-key matches, new keys required — followed by one row per unique
+  string or binding, where you can adjust the outcome before anything is written:
+</p>
+<ul>
+  <li><span class="ui">Use Existing</span> — reuse a key that already holds this exact text (only offered when one exists).</li>
+  <li><span class="ui">Create New</span> / <span class="ui">New Key</span> — make a new key, editable inline before applying.</li>
+  <li><span class="ui">Skip</span> — leave this particular row untouched (offered for Change Table and Repair; not for a plain Bind, where every row is new by definition).</li>
+</ul>
+<p>Nothing is written until you press <span class="ui">Apply</span> — <span class="ui">Cancel</span>, or simply closing the window, leaves everything exactly as it was. One confirmation dialog covers the whole batch, however many objects are involved.</p>
+<div class="callout warn">
+  <p class="callout-label">⚠ Prefab asset writes are the one exception to Undo</p>
+  <p>
+    If the preview includes any object that lives directly on a prefab <em>asset</em> (not a
+    scene instance of one), the window warns you before you apply: those specific writes are
+    <strong>not undoable via <kbd>Ctrl+Z</kbd></strong>. Everything else this tool does — Bind,
+    Unbind, Change Table, Merge Keys, Delete Unused Keys, Clear Values — is undoable normally;
+    this is the one genuine exception, and the tool always tells you when it applies before you
+    can apply anything.
+  </p>
+</div>
+
+<h2 id="coverage">Coverage</h2>
+<p>Press <span class="ui">Coverage…</span> in the Keys toolbar to open <strong>Localization Coverage</strong> — a visual audit, not a wall of numbers.</p>
+<ul>
+  <li>
+    <strong>Overall</strong> — a pie chart plus a legend of Localized / Unlocalized /
+    <strong>Needs Attention</strong> (this bucket combines Missing Key, Broken Binding, Empty
+    Binding, Disconnected, and Needs Review into one "something's off here" figure — switch to
+    the main window's filters, or the <span class="ui">All</span> filter, to see exactly which).
+  </li>
+  <li>
+    <strong>By Scene / Prefab</strong> — the same three-way breakdown, one horizontal bar per
+    scanned location, so you can see exactly where the unlocalized text physically lives.
+  </li>
+  <li>
+    <strong>By Table</strong> — a different question, since a table has no notion of
+    "unlocalized" on its own: how many keys exist, how many are actually referenced by
+    anything the last scan found (used vs. unused), with a ⚠ badge on any table that also has
+    duplicate source text or references to a key that no longer exists in it.
+  </li>
+</ul>
+<p>
+  Coverage computes from whatever the main window's <strong>last scan</strong> found — its own
+  <span class="ui">Refresh</span> button recomputes from those same results, it doesn't run a
+  new scan itself. If you haven't scanned yet, it says so and asks you to scan
+  <span class="ui">Entire Project</span> first for the most complete picture.
+</p>
+
+<h2 id="duplicates">Find Duplicate Text</h2>
+<p>
+  Open it from the Keys toolbar. Finds every group of keys — across every table in the project,
+  not just one — that currently hold identical text in a chosen <span class="ui">Compare
+  Locale</span>. Two keys with the same source text are two separate translation jobs that can
+  silently drift apart over time; this is how you find and consolidate them.
+</p>
+<ol class="steps">
+  <li>Each group starts collapsed; expand one to see every table/key holding that text, all checked by default.</li>
+  <li>Uncheck any entry you want left alone — only checked entries are considered for the merge.</li>
+  <li>With 2+ still checked, pick which one <span class="ui">Keep</span>s — it keeps its name and receives the combined values; the others are deleted.</li>
+  <li>Press <span class="ui">Merge N Selected…</span> to build a preview.</li>
+</ol>
+<p>
+  The preview shows exactly which keys will be removed, how many objects will be automatically
+  repointed to the survivor, and — critically — flags any locale where the checked keys
+  currently hold <em>different</em> values (a real conflict, not just a duplicate). For each
+  conflicting locale you pick which value survives via a toolbar. Locales with no conflict
+  combine automatically. Press <span class="ui">Merge Keys</span> to apply — one confirmation
+  regardless of size, and this one <strong>is</strong> undoable via <kbd>Ctrl+Z</kbd> (no
+  prefab-asset caveat here, since it only ever touches table data).
+</p>
+
+<h2 id="unused">Find Unused Keys</h2>
+<p>
+  Open it from the Keys toolbar, pick a table. Lists every key with zero references in the
+  <strong>main window's last scan</strong> — this window doesn't run its own scan, it reads
+  whatever the main window already found. If nothing has been scanned yet, it says so up front
+  rather than showing a misleadingly empty list.
+</p>
+<div class="callout warn">
+  <p class="callout-label">⚠ Before deleting</p>
+  <p>
+    "Unused" means "not referenced by the scan currently in memory." A key used only by a
+    scene or prefab outside that scan's scope will show as unused even though it's genuinely in
+    use — and a key assigned dynamically in code is invisible to any static scan regardless of
+    scope. Run <span class="ui">Entire Project</span> in the main window first if you want this
+    list to be trustworthy, and double-check before deleting either way.
+  </p>
+</div>
+<p>
+  <span class="ui">Select All</span> / <span class="ui">Deselect All</span> / <span class="ui">Invert</span>
+  work the same way as everywhere else in this tool. <span class="ui">Delete Selected (N)</span>
+  shows one confirmation and is undoable via <kbd>Ctrl+Z</kbd>.
+</p>
+
+<h2 id="clear">Clear Values</h2>
+<p>
+  Open it from the Keys toolbar, or from a row's Details panel with objects already selected.
+  Bulk-clears the text value for a set of keys, in one locale or every locale at once — genuinely
+  new functionality Unity's own Table window has no equivalent for.
+</p>
+<ul>
+  <li><span class="ui">From Selection</span> — uses the keys resolved from whatever's currently selected in the main window (only offered when that selection actually has bound rows).</li>
+  <li><span class="ui">Pick Table &amp; Keys</span> — choose a table and any of its keys directly, whether or not they're currently bound to anything in a scan.</li>
+</ul>
+<p>
+  Then choose <span class="ui">Clear In</span>: a specific locale, or <span class="ui">All Locales</span>
+  to wipe every locale's value for the selected keys at once. The preview line does the
+  multiplication for you — N keys × M locales = however many individual values will actually be
+  cleared. Press <span class="ui">Clear Values</span>; one confirmation, undoable via <kbd>Ctrl+Z</kbd>.
+</p>
+<div class="callout">
+  <p class="callout-label">The deliberate use case</p>
+  <p>
+    Clear Values is how you force a specific cell to be re-translated: clear it here, then run
+    <a href="stringflow-translate.html">StringFlow Translate</a>, which — by design — only ever
+    fills cells that are currently empty. Clearing is the intentional way to make room for a
+    fresh pass on specific entries without touching anything else in the table.
+  </p>
+</div>
+
+<div class="page-nav">
+  <a href="getting-started.html"><span class="dir">&larr; Previous</span><span class="label">Getting Started</span></a>
+  <a href="stringflow-translate.html" class="next"><span class="dir">Next &rarr;</span><span class="label">StringFlow Translate</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

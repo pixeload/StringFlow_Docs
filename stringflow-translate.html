@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StringFlow Translate — StringFlow Documentation</title>
+<meta name="description" content="Fill in empty cells with machine translation, safely and repeatably.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html" class="current">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">The Three Tools</p>
+  <h1>StringFlow Translate</h1>
+  <p class="lede">
+    Fills in empty cells in a String Table Collection using a local machine-translation
+    server. It never touches a cell that already has a value, so running it is always
+    non-destructive — on a fresh table or one you've been hand-editing for months.
+  </p>
+</div>
+
+<p>
+  Open it from <span class="path">Tools ▸ StringFlow ▸ StringFlow Translate</span>. It needs a
+  running translation server — see
+  <a href="environment-setup.html">StringFlow Environment Setup</a> if you haven't set one up
+  yet.
+</p>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#connection">Checking the connection</a></li>
+    <li><a href="#running">Running a translation</a></li>
+    <li><a href="#key-list">Reading the key list</a></li>
+    <li><a href="#protection">What's protected from translation</a></li>
+    <li><a href="#progress">Progress, Cancel, and "nothing to translate"</a></li>
+    <li><a href="#performance">Performance settings</a></li>
+    <li><a href="#routing">StringFlow Routing</a></li>
+    <li><a href="#languages">StringFlow Languages</a></li>
+    <li><a href="#history">StringFlow History</a></li>
+  </ul>
+</div>
+
+<h2 id="connection">Checking the connection</h2>
+<p>
+  Press <span class="ui">Test All</span>. The status line reads
+  <em>All N connected</em> once every enabled backend answers. If it doesn't,
+  <a href="environment-setup.html">StringFlow Environment Setup</a> is where that gets fixed —
+  this window only tests and uses backends, it doesn't install or start them.
+</p>
+
+<h2 id="running">Running a translation</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Field</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">Table</span></td><td>The String Table Collection to translate.</td></tr>
+      <tr>
+        <td><span class="ui">Source Language</span></td>
+        <td>The locale to translate <em>from</em>. <span class="ui">Auto</span> picks the first non-empty value per key — useful for a table filled in unevenly across locales.</td>
+      </tr>
+      <tr>
+        <td><span class="ui">Target Language</span></td>
+        <td><span class="ui">Auto / All Empty</span> fills every other locale's empty cells in one run, not just one target at a time.</td>
+      </tr>
+      <tr>
+        <td><span class="ui">Translation Type</span></td>
+        <td><span class="ui">All Missing</span> considers every key in the table; <span class="ui">Selected Missing</span> considers only the keys you've checked in the key list below.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>Press <span class="ui">Translate</span>.</p>
+
+<div class="callout">
+  <p class="callout-label">Both modes only fill empty cells</p>
+  <p>
+    Neither <span class="ui">Translation Type</span> can overwrite an existing value — machine
+    or human, reviewed or not. There is deliberately no "this will replace N entries"
+    confirmation, because there's nothing to replace. Re-running the exact same settings twice
+    in a row is a no-op the second time. To force a specific cell to be re-translated, clear it
+    first with StringFlow Tables' <a href="stringflow-tables.html#clear">Clear Values</a>.
+  </p>
+</div>
+
+<h2 id="key-list">Reading the key list</h2>
+<p>
+  Below the run settings, the key list shows every key in the selected table — in the same
+  order Unity's own Table window shows them — with a search field to filter by name. In
+  <span class="ui">Selected Missing</span> mode, checkboxes appear alongside
+  <span class="ui">Select All</span> (checks every currently visible/filtered key) and
+  <span class="ui">Select None</span>.
+</p>
+<p>
+  Each key's row shows one colored dot per locale. The color reflects the <strong>latest
+  recorded translation outcome</strong> for that exact cell — not just whether it currently has
+  a value, which is a meaningfully different question a plain text-filled/empty view can't
+  answer:
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Dot meaning</th><th>What it tells you</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Empty, never tried</strong></td><td>No value, and no run has ever attempted this cell.</td></tr>
+      <tr><td><strong>Empty, skipped</strong></td><td>A run deliberately skipped this cell (e.g. source and target were the same locale for it) and it's still empty.</td></tr>
+      <tr><td><strong>Empty, failed</strong></td><td>A run tried this cell and it failed — still empty, but not for lack of trying. Worth investigating rather than assuming it'll fix itself on the next run.</td></tr>
+      <tr><td><strong>Filled, no recorded run</strong></td><td>Has a value, but nothing in history explains where it came from — pre-existing text, or something typed in by hand.</td></tr>
+      <tr><td><strong>Filled, clean</strong></td><td>Has a value from a run that translated the whole string in one clean pass.</td></tr>
+      <tr><td><strong>Filled, needs review</strong></td><td>Has a value, but it came from a run that had to fall back to translating in segments — worth a human glance.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>Hover any dot for the exact detail behind it, including which run produced it, via <a href="#history">StringFlow History</a>.</p>
+
+<h2 id="protection">What's protected from translation</h2>
+<p>
+  Before a string is sent to the server, StringFlow strips off any Rich Text tag that wraps
+  the <em>entire</em> string (e.g. a leading <code>&lt;color=red&gt;</code> and its matching
+  trailing <code>&lt;/color&gt;</code>) and sends only the text between them — those tags
+  never touch the translator and come back exactly as they were.
+</p>
+<p>
+  Everything else that shouldn't be translated — placeholders like <code>{playerName}</code>,
+  <code>{0}</code>, printf-style <code>%s</code> / <code>%d</code>, inline Rich Text tags in
+  the middle of a sentence, and emoji — is swapped for an index token before sending, and
+  swapped back afterward. This is why <code>Hello {playerName}, you have %d coins left</code>
+  comes back with <code>{playerName}</code> and <code>%d</code> intact instead of translated
+  or mangled. A cell built this way is what shows as <strong>Filled, needs review</strong> in
+  the key list above — the meaning is normally right, but it's worth a native speaker's eye
+  since it was reassembled from segments rather than translated as one clean sentence.
+</p>
+
+<h2 id="progress">Progress, Cancel, and "nothing to translate"</h2>
+<p>
+  Tick <span class="ui">Show Progress</span> to watch a run work key by key.
+  <span class="ui">Cancel</span> stops it at any point — whatever finished up to that point is
+  kept, nothing is rolled back. Press <span class="ui">Refresh</span> afterward to re-read the
+  table's current state.
+</p>
+<p>
+  If you press <span class="ui">Translate</span> and every applicable cell in scope is already
+  filled, a dialog says so plainly — <em>"Nothing to translate — all applicable cells are
+  already filled."</em> — rather than silently doing nothing. If you were expecting it to fill
+  something, check <span class="ui">Translation Type</span> (are the right keys actually
+  selected, for <span class="ui">Selected Missing</span>?) and Source/Target Language before
+  assuming something's broken.
+</p>
+
+<h2 id="performance">Performance settings</h2>
+<p>
+  A collapsible <strong>Performance</strong> section controls how a run is dispatched — never
+  what anything is translated to, and it applies across every backend a run might use, not
+  just one:
+</p>
+<ul>
+  <li>
+    <strong>Parallel Requests</strong> — how many requests may be in flight at once. Defaults
+    to your machine's logical core count. Translation backends are typically CPU/GPU-bound, so
+    raising this past what a backend can actually chew through won't speed anything up and can
+    cause timeouts instead.
+  </li>
+  <li>
+    <strong>Entries per Request</strong> — how many entries of the same language pair share one
+    HTTP request. Each is still translated completely independently by the backend — nothing is
+    merged, nothing is split, results are identical to one-request-per-entry, just with less
+    network overhead. Set to 1 to reproduce the original one-entry-per-request behavior exactly.
+  </li>
+  <li>
+    Identical source text within one run is translated once and the result reused across every
+    key that shares it — nothing is cached <em>between</em> separate runs, though.
+  </li>
+</ul>
+<p>Underneath, a <strong>request timeout</strong> toggle:</p>
+<ul>
+  <li>
+    <strong>Unlimited</strong> (default) — a request waits exactly as long as it takes, with no
+    automatic recovery from a genuinely stuck one.
+  </li>
+  <li>
+    <strong>Limited</strong> — a request that hasn't answered within the configured time is
+    treated as failed, retried, then falls back to the next backend, exactly like any other
+    network error. This is what protects a run from a dropped connection or a crashed
+    container hanging forever.
+  </li>
+</ul>
+<div class="callout warn">
+  <p class="callout-label">⚠ A GPU backend's first request is legitimately slow</p>
+  <p>
+    A local GPU-backed engine can take far longer on its very first request than every one
+    after it — the model is warming up CUDA kernels, not stuck. A Limited timeout tuned for
+    steady-state can kill that one legitimate slow call before it finishes; there's a specific
+    "ignore for first entry" option alongside the timeout for exactly this case. If a run's
+    very first translation always fails but everything after it works, this is almost
+    certainly why.
+  </p>
+</div>
+
+<h2 id="routing">StringFlow Routing</h2>
+<p>Press <span class="ui">Configure Routing…</span> to open it. This is where backends, language maps, and routing preferences live.</p>
+
+<h3>Backends</h3>
+<p>Each row: a checkbox to enable/disable it for the router, its URL (editable, commits on Enter or losing focus), a <span class="ui">Test</span> button, and reorder/remove controls. <span class="ui">Add Backend</span> creates a new disabled entry pointed at a placeholder URL — see <a href="connecting-backends.html">Connecting Custom Backends</a> for wiring up your own server.</p>
+
+<h3>Priority order and Rules</h3>
+<p>For any (source, target) pair with no more specific instruction, StringFlow walks the backend list top to bottom — this is the same reorderable list shown in both windows. <strong>Rules</strong> override that for specific pairs: an ordered list of <em>source → target → backend</em>, either side allowed to be <code>*</code> for "anything." The first enabled rule that matches wins that pair's preferred backend — still just a preference, since if that backend can't actually serve the pair, the fallback order still applies underneath it.</p>
+
+<h3>Dynamic Routing</h3>
+<p>When on, the backend that most recently <em>actually succeeded</em> for an exact (source, target) pair is remembered and preferred next time, with no rule needed — routing gets faster to converge the more you translate. An explicit Rule always wins over a learned shortcut. When off, routing is fully static: only Rules and the fallback order decide anything.</p>
+
+<h3>Language code maps</h3>
+<p>Only needed for a backend whose language codes aren't Unity locale codes already (LibreTranslate is discovered live and needs no map at all). Add a Unity locale code on one side and that backend's own code for it on the other. A locale with no entry is simply skipped on that backend, never a hard failure — see <a href="connecting-backends.html#language-codes">Connecting Custom Backends</a> for the full picture.</p>
+
+<h2 id="languages">StringFlow Languages</h2>
+<p>Open it from the <span class="ui">Language Support…</span> button. A read-only, searchable list of every language each configured backend can currently be asked to handle.</p>
+<div class="callout warn">
+  <p class="callout-label">⚠ LibreTranslate's languages only appear after you Test it</p>
+  <p>
+    This window makes no network calls of its own — it only reads what's already known.
+    LibreTranslate's language list specifically comes from its <strong>last live Test this
+    session</strong>. If StringFlow Languages shows LibreTranslate covering zero languages,
+    that doesn't mean the server has no languages — it means it hasn't been tested yet this
+    session. Go test it in <a href="#connection">the main window</a> (or press
+    <span class="ui">Test All</span>) and this list updates.
+  </p>
+</div>
+<p>Every other backend's languages come from its static language-code map on StringFlow Routing instead, which needs no live test to read.</p>
+
+<h2 id="history">StringFlow History</h2>
+<p>Press <span class="ui">History</span> to open it — a genuine chronological record of every translation run, grouped by run ("Translation 1", "Translation 2", …), each collapsible.</p>
+<ul>
+  <li><span class="ui">Table</span> — pick one table's history, or <span class="ui">All Tables</span> for every recorded run across the project.</li>
+  <li><strong>Filter</strong> — All / Translated / Needs Review / Failed / Skipped.</li>
+  <li><strong>Search</strong> — filter by key name.</li>
+  <li>Each row shows a Source cell (that key's actually-resolved source locale and text) followed by one cell per target locale that run wrote, colored to match the same clean/needs-review/failed/skipped states as the key list's dots.</li>
+</ul>
+<p>
+  Clicking a row that still resolves to a real key opens it directly in Unity's native Table
+  window. A key or table that's since been deleted is marked <strong>(deleted)</strong> rather
+  than silently vanishing from history or crashing the window — the record survives even
+  though there's nothing left to jump to. Right-click a run or a single entry to delete just
+  that record; the toolbar's <span class="ui">Delete All</span> clears everything currently
+  shown.
+</p>
+<div class="callout">
+  <p class="callout-label">Deleting history is always safe</p>
+  <p>
+    Deleting a history record — one entry, one run, or everything via
+    <span class="ui">Delete All</span> — only ever removes the record of what happened. It
+    never touches the table itself or any translated text currently sitting in it.
+  </p>
+</div>
+
+<div class="page-nav">
+  <a href="stringflow-tables.html"><span class="dir">&larr; Previous</span><span class="label">StringFlow Tables</span></a>
+  <a href="environment-setup.html" class="next"><span class="dir">Next &rarr;</span><span class="label">StringFlow Environment Setup</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

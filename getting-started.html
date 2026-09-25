@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting Started — StringFlow Documentation</title>
+<meta name="description" content="Install StringFlow and translate your first table, from a clean project.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html" class="current">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">Overview</p>
+  <h1>Getting Started</h1>
+  <p class="lede">
+    From a fresh import to a fully translated table. This page is the fast path — each step
+    links to the page that covers it in depth.
+  </p>
+</div>
+
+<h2>Requirements</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th></th><th></th></tr></thead>
+    <tbody>
+      <tr><td><strong>Unity</strong></td><td>6000.3 or newer</td></tr>
+      <tr><td><strong>Unity Localization package</strong></td><td><code>com.unity.localization</code>, installed via Package Manager. Required for StringFlow Translate and StringFlow Environment Setup. StringFlow Tables works without it.</td></tr>
+      <tr><td><strong>Docker Desktop</strong></td><td>Free from <a href="https://www.docker.com/products/docker-desktop/">docker.com</a>. Only needed for StringFlow Translate — the translation server runs inside it, on your machine.</td></tr>
+      <tr><td><strong>Disk space</strong></td><td>~4 GB free, for the server image and its language models (downloaded once).</td></tr>
+      <tr><td><strong>Time, first run only</strong></td><td>~20–30 minutes of unattended downloading.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout warn">
+  <p class="callout-label">⚠ On macOS, one thing to know before you start</p>
+  <p>
+    macOS reserves port 5000 for AirPlay Receiver — the same port the default translation
+    server wants. Either turn off AirPlay Receiver under
+    <strong>System Settings ▸ General ▸ AirDrop &amp; Handoff</strong>, or change the server's
+    port later in <span class="ui">StringFlow Routing</span>. Details on the
+    <a href="troubleshooting.html#port-conflict">Troubleshooting</a> page.
+  </p>
+</div>
+
+<h2>The fast path</h2>
+<ol class="steps">
+  <li>
+    <strong>Install Docker Desktop and start it.</strong>
+    Wait until it reports it's running. See <a href="environment-setup.html">StringFlow Environment Setup</a>.
+  </li>
+  <li>
+    <strong>Open <span class="path">Tools ▸ StringFlow ▸ StringFlow Environment Setup</span> and press <span class="ui">Start Setup</span>.</strong>
+    It checks Docker, then walks you through installing the LibreTranslate engine — free, ~50 languages, no licence decision needed. Skip NLLB unless you specifically need it (see <a href="licensing.html#nllb">Licensing</a>).
+  </li>
+  <li>
+    <strong>Let the first download finish.</strong>
+    The server downloads its language models once — roughly 20–30 minutes, unattended. The row shows live progress the whole time. Don't interrupt it; see <a href="troubleshooting.html#crash-loop">Troubleshooting</a> if you do.
+  </li>
+  <li>
+    <strong>Open <span class="path">Tools ▸ StringFlow ▸ StringFlow Translate</span>.</strong>
+    Press <span class="ui">Test All</span> to confirm the connection, then set Table, Source Language, Target Language and Translation Type, and press <span class="ui">Translate</span>. Full walkthrough on <a href="stringflow-translate.html">StringFlow Translate</a>.
+  </li>
+  <li>
+    <strong>Before all that — if your text isn't in String Tables yet</strong>, open <span class="path">Tools ▸ StringFlow ▸ StringFlow Tables</span> first to find and link it. See <a href="stringflow-tables.html">StringFlow Tables</a>.
+  </li>
+</ol>
+
+<h2>What "safe" means here</h2>
+<p>
+  Both StringFlow Tables and StringFlow Translate are built around the same rule: they only
+  ever act on what's missing or explicitly selected. StringFlow Translate never overwrites a
+  cell that already has a value — machine-made or hand-written — so re-running a translation
+  pass is always safe. StringFlow Tables' cleanup actions (removing unused keys, clearing
+  values) always show you exactly what will change before anything happens, and everything
+  goes through Unity's Undo system.
+</p>
+
+<div class="page-nav">
+  <a href="introduction.html"><span class="dir">&larr; Previous</span><span class="label">Introduction</span></a>
+  <a href="stringflow-tables.html" class="next"><span class="dir">Next &rarr;</span><span class="label">StringFlow Tables</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

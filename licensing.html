@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Licensing & Third-Party Notices — StringFlow Documentation</title>
+<meta name="description" content="What StringFlow ships, what it downloads, and what each licence actually permits.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html" class="current">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">Going Further</p>
+  <h1>Licensing &amp; Third-Party Notices</h1>
+  <p class="lede">
+    StringFlow's own code is yours under the licence you bought it under. Everything on this
+    page is about the third-party software it drives — none of which ships inside StringFlow
+    itself.
+  </p>
+</div>
+
+<div class="callout">
+  <p class="callout-label">The one thing worth understanding first</p>
+  <p>
+    StringFlow ships its own C# code, a Dockerfile, and a small Python service. It does not
+    ship LibreTranslate, Argos models, or NLLB weights. Each of those is downloaded by Docker
+    or by the service container, from its own official source, onto <strong>your</strong>
+    machine, at the moment you choose to install it. That distinction is why the licences below
+    are things <em>you</em> agree to by using them — not terms StringFlow imposes on you.
+  </p>
+</div>
+<p>This page is informational and is not legal advice.</p>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#libretranslate">LibreTranslate</a></li>
+    <li><a href="#argos">Argos Translate models</a></li>
+    <li><a href="#nllb">NLLB</a></li>
+    <li><a href="#deps">Python libraries in the bundled service</a></li>
+    <li><a href="#docker">Docker Desktop</a></li>
+    <li><a href="#unity-loc">Unity Localization</a></li>
+  </ul>
+</div>
+
+<h2 id="libretranslate">LibreTranslate</h2>
+<div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><td><strong>Licence</strong></td><td>GNU Affero General Public License v3.0 (AGPL-3.0)</td></tr>
+      <tr><td><strong>Source</strong></td><td><a href="https://github.com/LibreTranslate/LibreTranslate">github.com/LibreTranslate/LibreTranslate</a></td></tr>
+      <tr><td><strong>How StringFlow gets it</strong></td><td>Pulls the official public image <code>libretranslate/libretranslate</code> via Docker, unmodified.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  AGPL is not a problem here because of <em>how</em> it's used: StringFlow talks to it over
+  HTTP, as a separate process — it never links against LibreTranslate's code or redistributes
+  it. If you were to modify LibreTranslate's own source and offer that modified version to
+  others over a network, AGPL's terms would apply to <em>that</em>; simply running the
+  unmodified official image to translate your own project doesn't trigger any obligation.
+</p>
+
+<h2 id="argos">Argos Translate models</h2>
+<div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><td><strong>Licence</strong></td><td>Dual licensed: MIT License <em>or</em> CC0 1.0 (public domain)</td></tr>
+      <tr><td><strong>Source</strong></td><td><a href="https://github.com/argosopentech/argospm-index">github.com/argosopentech/argospm-index</a></td></tr>
+      <tr><td><strong>How StringFlow gets it</strong></td><td>Downloaded by the LibreTranslate container itself, on its first start.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>These are the actual translation models LibreTranslate uses. Permissive, no attribution required, safe for commercial use.</p>
+
+<h2 id="nllb">NLLB <span style="font-weight:400;color:var(--muted);font-size:0.7em;">— optional, non-commercial</span></h2>
+<div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><td><strong>Licence</strong></td><td>CC-BY-NC-4.0 (Creative Commons Attribution-NonCommercial 4.0)</td></tr>
+      <tr><td><strong>Model</strong></td><td><code>facebook/nllb-200-distilled-600M</code> (StringFlow's default; the underlying service can point at a different model — see below)</td></tr>
+      <tr><td><strong>Source</strong></td><td><a href="https://huggingface.co/facebook/nllb-200-distilled-600M">huggingface.co/facebook/nllb-200-distilled-600M</a></td></tr>
+      <tr><td><strong>How StringFlow gets it</strong></td><td>Downloaded from Hugging Face by the service container on your machine, and only after you've explicitly enabled this engine and ticked its licence acknowledgement in StringFlow Environment Setup.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout danger">
+  <p class="callout-label">⚠ Non-commercial means the <em>use</em>, not just the download</p>
+  <p>
+    CC-BY-NC-4.0 §2.1.1 grants the right to "reproduce and Share the Licensed Material ... for
+    NonCommercial purposes only", and §1.9 defines NonCommercial as "not primarily intended for
+    or directed towards commercial advantage or monetary compensation". The restriction attaches
+    to <em>running</em> the model, not only to redistributing it — so using it to translate
+    strings for a commercial game is a commercial use, even though the model itself never ships
+    inside your build and isn't running at play time. Meta's own model card additionally states
+    NLLB-200 is a research model "not released for production deployment".
+  </p>
+  <p>
+    Free availability isn't the same thing as permission — the download being free is exactly
+    what the licence grants; the non-commercial clause is what it withholds.
+  </p>
+</div>
+
+<p>For a commercial project, you have two real options:</p>
+<ul>
+  <li><strong>Use LibreTranslate instead</strong> — fully permissive, no licence decision needed.</li>
+  <li>
+    <strong>Point the NLLB service at a permissively licensed model.</strong>
+    <code>app.py</code> reads the model to load from the <code>MODEL_NAME</code> environment
+    variable, so this doesn't require rebuilding the image — see
+    <a href="manual-setup.html#nllb">Manual Setup — NLLB</a> for how to set it. Two options
+    worth knowing:
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Model</th><th>Licence</th><th>Languages</th></tr></thead>
+        <tbody>
+          <tr><td><code>facebook/m2m100_418M</code></td><td>MIT</td><td>100</td></tr>
+          <tr><td><code>google/madlad400-3b-mt</code></td><td>Apache-2.0</td><td>400+</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:0.6rem;font-size:0.92rem;color:var(--muted);">
+      Note this is a genuine swap, not a drop-in: these models use a different tokenizer
+      convention than NLLB (<code>get_lang_id()</code> with plain ISO codes, rather than NLLB's
+      FLORES-200 <code>forced_bos_token_id</code> approach), so the service's translation call
+      and its language map need matching changes, not just the environment variable.
+    </p>
+  </li>
+</ul>
+<p>This is informational, not legal advice — when in doubt for your specific situation, get it reviewed.</p>
+
+<h2 id="deps">Python libraries in the bundled service</h2>
+<p>
+  Installed by <code>pip</code> into the NLLB service image when it's built on your machine;
+  never redistributed by StringFlow itself.
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Library</th><th>Licence</th></tr></thead>
+    <tbody>
+      <tr><td>PyTorch (<code>torch</code>)</td><td>BSD-3-Clause</td></tr>
+      <tr><td>Hugging Face <code>transformers</code></td><td>Apache-2.0</td></tr>
+      <tr><td><code>sentencepiece</code></td><td>Apache-2.0</td></tr>
+      <tr><td><code>accelerate</code></td><td>Apache-2.0</td></tr>
+      <tr><td><code>fastapi</code></td><td>MIT</td></tr>
+      <tr><td><code>uvicorn</code></td><td>BSD-3-Clause</td></tr>
+      <tr><td><code>python:3.11-slim</code> base image</td><td>Python Software Foundation License, plus Debian-packaged components under their own licences</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="docker">Docker Desktop</h2>
+<p>
+  Not included with StringFlow, and not installed by it — you install and run Docker yourself;
+  StringFlow only detects whether it's present.
+</p>
+<p>
+  At the time of writing, Docker Desktop is free for personal use, education, non-commercial
+  open source projects, and small businesses (<strong>fewer than 250 employees and less than
+  $10 million in annual revenue</strong>). Larger organisations need a paid Docker
+  subscription. Check Docker's current terms for your situation:
+  <a href="https://docs.docker.com/subscription/desktop-license/">docs.docker.com/subscription/desktop-license</a>.
+</p>
+<p>
+  Alternatives that expose the same <code>docker</code> command line — Rancher Desktop, Podman,
+  colima — generally work with StringFlow, since it only ever invokes <code>docker</code> and
+  never anything Docker-Desktop-specific.
+</p>
+
+<h2 id="unity-loc">Unity Localization</h2>
+<p>
+  StringFlow Translate and StringFlow Environment Setup require Unity's own Localization
+  package (<code>com.unity.localization</code>), distributed by Unity under the Unity
+  Companion License and not included with StringFlow. Install it via
+  <span class="path">Window ▸ Package Manager ▸ Unity Registry</span>. StringFlow Tables works
+  without it.
+</p>
+
+<div class="page-nav">
+  <a href="connecting-backends.html"><span class="dir">&larr; Previous</span><span class="label">Connecting Custom Backends</span></a>
+  <a href="troubleshooting.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Troubleshooting</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

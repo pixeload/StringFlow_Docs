@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual Setup (No Wizard) — StringFlow Documentation</title>
+<meta name="description" content="Every step the setup wizard automates, done by hand with raw Docker commands.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html" class="current">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">Going Further</p>
+  <h1>Manual Setup (No Wizard)</h1>
+  <p class="lede">
+    Everything <a href="environment-setup.html">StringFlow Environment Setup</a> automates,
+    done by hand. Useful if the wizard is stuck on something environment-specific it can't see
+    past, or if you just want to know exactly what's running on your machine and why.
+  </p>
+</div>
+
+<div class="callout">
+  <p class="callout-label">You don't need this page for normal use</p>
+  <p>
+    StringFlow Translate only cares that <em>something</em> answers at the URL configured in
+    <span class="path">StringFlow Routing</span> — it has no idea whether that server was
+    started by the wizard or by you typing commands into a terminal. Either way works
+    identically from StringFlow's side.
+  </p>
+</div>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#libretranslate">LibreTranslate, by hand</a></li>
+    <li><a href="#nllb">NLLB, by hand</a></li>
+    <li><a href="#point-stringflow">Pointing StringFlow at it</a></li>
+    <li><a href="#stopping">Stopping and removing</a></li>
+  </ul>
+</div>
+
+<h2 id="libretranslate">LibreTranslate, by hand</h2>
+<p>With Docker Desktop installed and running, in any terminal:</p>
+
+<p class="code-label">Pull the image</p>
+<pre><code>docker pull libretranslate/libretranslate</code></pre>
+
+<p class="code-label">Run it</p>
+<pre><code>docker run -d --name libretranslate-service \
+  --restart unless-stopped \
+  -p 5000:5000 \
+  -v lt-local:/home/libretranslate/.local \
+  libretranslate/libretranslate</code></pre>
+
+<p>
+  That's the whole thing. <code>-p 5000:5000</code> publishes the server on
+  <code>http://localhost:5000</code>; <code>-v lt-local:/home/libretranslate/.local</code>
+  is a named Docker volume that keeps every downloaded language model on your machine, so a
+  removed-and-recreated container doesn't re-download anything. On first start, the container
+  downloads a translation model for every language it supports (~50 languages, ~20–30 minutes,
+  a few GB) — that's normal; watch it with:
+</p>
+<pre><code>docker logs -f libretranslate-service</code></pre>
+<p>Once it's ready:</p>
+<pre><code>curl http://localhost:5000/languages</code></pre>
+<p>should return a JSON array of language objects.</p>
+
+<div class="callout warn">
+  <p class="callout-label">⚠ macOS: port 5000</p>
+  <p>
+    If <code>docker run</code> fails to bind port 5000, macOS's AirPlay Receiver is almost
+    certainly holding it. Either turn that off (<strong>System Settings ▸ General ▸ AirDrop
+    &amp; Handoff</strong>) or publish on a different host port, e.g. <code>-p 5001:5000</code>
+    — then point StringFlow at <code>http://localhost:5001</code> instead (see
+    <a href="#point-stringflow">below</a>). Note the container's own internal port stays
+    <code>5000</code> either way; only the number on the <em>left</em> of the colon changes.
+  </p>
+</div>
+
+<h2 id="nllb">NLLB, by hand</h2>
+<div class="callout warn">
+  <p class="callout-label">⚠ Read this first</p>
+  <p>
+    NLLB's default model is released under a non-commercial licence. Read
+    <a href="licensing.html#nllb">Licensing — NLLB</a> before you build or use this one,
+    manually or otherwise — building it yourself doesn't change what the licence permits.
+  </p>
+</div>
+<p>
+  NLLB isn't pulled from a public registry — its Dockerfile and Python service ship inside
+  this package and are built locally. To do that build yourself instead of through the wizard:
+</p>
+<ol class="steps">
+  <li>
+    <strong>Gather the build files.</strong>
+    In your project, find <span class="path">Assets/StringFlow/LibreTranslate/Environment/DockerSources/nllb/</span>
+    — the exact path can vary depending on where StringFlow was imported in <em>your</em>
+    project, so if that folder isn't there, use the Project window's search to find
+    <code>DockerSources</code> instead. Copy these four files into a new empty folder on disk,
+    renaming each as shown (Unity imports them with a <code>.txt</code> suffix so it doesn't try
+    to compile them as code):
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>In the project</th><th>Rename to</th></tr></thead>
+        <tbody>
+          <tr><td><code>Dockerfile.txt</code></td><td><code>Dockerfile</code> (CPU variant)</td></tr>
+          <tr><td><code>Dockerfile.gpu.txt</code></td><td><code>Dockerfile.gpu</code> (optional GPU variant)</td></tr>
+          <tr><td><code>app.py.txt</code></td><td><code>app.py</code></td></tr>
+          <tr><td><code>requirements.txt.txt</code></td><td><code>requirements.txt</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </li>
+  <li>
+    <strong>Build the image</strong> from that folder:
+    <pre><code># CPU (works everywhere)
+docker build -f Dockerfile -t nllb-translate-service .
+
+# or, GPU (needs an NVIDIA GPU and Docker's --gpus support)
+docker build -f Dockerfile.gpu -t nllb-translate-service-gpu .</code></pre>
+  </li>
+  <li>
+    <strong>Run it</strong>, mounting a persistent cache directory so model weights survive a
+    rebuild:
+    <pre><code># CPU
+docker run -d --name nllb-service \
+  --restart unless-stopped \
+  -p 5002:8000 \
+  -v "$HOME/AppData/Local/UiToolKit/HuggingFaceCache:/root/.cache/huggingface" \
+  nllb-translate-service
+
+# GPU — adds --gpus all
+docker run -d --name nllb-service \
+  --restart unless-stopped \
+  --gpus all \
+  -p 5002:8000 \
+  -v "$HOME/AppData/Local/UiToolKit/HuggingFaceCache:/root/.cache/huggingface" \
+  nllb-translate-service-gpu</code></pre>
+    <p>
+      On macOS/Linux, use whatever local cache directory you like in place of the Windows path
+      above — it just needs to be a real folder on your machine, mounted the same way each time
+      you run the container. The container listens on port <code>8000</code> internally; the
+      example publishes it on host port <code>5002</code>, matching StringFlow's default.
+    </p>
+  </li>
+  <li>
+    <strong>Point it at a different model, if you want one.</strong>
+    <code>app.py</code> reads the model to load from the <code>MODEL_NAME</code> environment
+    variable, defaulting to <code>facebook/nllb-200-distilled-600M</code>. Add
+    <code>-e MODEL_NAME=your/model-id</code> to the <code>docker run</code> command to use a
+    different one — see <a href="licensing.html#nllb">Licensing</a> for commercially-safe
+    alternatives.
+  </li>
+</ol>
+<pre><code>curl http://localhost:5002/languages</code></pre>
+<p>should return the service's language list once the model has finished loading.</p>
+
+<h2 id="point-stringflow">Pointing StringFlow at it</h2>
+<p>
+  However a server was started, StringFlow only needs to know its URL. Open
+  <span class="path">Tools ▸ StringFlow ▸ StringFlow Translate</span> and press its
+  <span class="ui">Configure Routing…</span> button to open <strong>StringFlow Routing</strong>,
+  then set the backend's <strong>URL</strong> field to match whatever host port you actually
+  published. Press
+  <span class="ui">Test</span> — if it answers, the row goes green and StringFlow Translate can
+  use it immediately, with no other configuration needed.
+</p>
+<p>
+  Since StringFlow always checks whether a server is <em>already answering</em> before doing
+  anything else, opening <span class="path">StringFlow Environment Setup</span> after starting
+  a container by hand will correctly show it as <strong>Ready</strong> — including offering
+  <span class="ui">Stop</span> / <span class="ui">Restart</span> for it, since it recognizes the
+  container by name (or by the port it publishes, if you gave it a different name).
+</p>
+
+<h2 id="stopping">Stopping and removing</h2>
+<pre><code># Stop (keeps the container and its downloaded data)
+docker stop libretranslate-service
+docker stop nllb-service
+
+# Remove the container (keeps the named volume / cache folder - nothing re-downloads)
+docker rm libretranslate-service
+docker rm nllb-service
+
+# Remove everything, including downloaded language models
+docker volume rm lt-local
+# (for NLLB, just delete the HuggingFaceCache folder from step 3 above)</code></pre>
+
+<div class="page-nav">
+  <a href="environment-setup.html"><span class="dir">&larr; Previous</span><span class="label">StringFlow Environment Setup</span></a>
+  <a href="connecting-backends.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Connecting Custom Backends</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

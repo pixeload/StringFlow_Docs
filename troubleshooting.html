@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting — StringFlow Documentation</title>
+<meta name="description" content="Specific fixes for every status this tool can show you.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html" class="current">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">Going Further</p>
+  <h1>Troubleshooting</h1>
+  <p class="lede">
+    Specific fixes, organized by what you're actually seeing. If a status dot or error message
+    brought you here, search this page for its exact wording.
+  </p>
+</div>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#stale-data">Something looks stale or out of date</a></li>
+    <li><a href="#port-conflict">Port conflict</a></li>
+    <li><a href="#crash-loop">"Starts, crashes, and restarts over and over"</a></li>
+    <li><a href="#nllb-repair-restarts">Repair on NLLB just restarts it</a></li>
+    <li><a href="#gpu-not-used">GPU selected, but it doesn't seem to be using it</a></li>
+    <li><a href="#docker-not-found">Docker isn't ready, even though it's running</a></li>
+    <li><a href="#docker-pull-blocked">A download or pull fails or hangs</a></li>
+    <li><a href="#not-answering">Stuck on "not answering yet"</a></li>
+    <li><a href="#menu-missing">Only StringFlow Tables shows up under Tools ▸ StringFlow</a></li>
+    <li><a href="#language-missing">A language isn't in the list</a></li>
+    <li><a href="#zero-languages">StringFlow Languages shows 0 languages for LibreTranslate</a></li>
+    <li><a href="#nothing-happened">Translate ran, but nothing changed</a></li>
+    <li><a href="#same-locale">"Source and target are the same locale"</a></li>
+    <li><a href="#recompile-interrupt">A run stopped partway through on its own</a></li>
+    <li><a href="#no-bind-button">Bind / Change Table button isn't there for a row</a></li>
+    <li><a href="#unused-wrong">Unused Keys (or Coverage) looks wrong</a></li>
+    <li><a href="#not-undoable">Ctrl+Z didn't undo something</a></li>
+    <li><a href="#history-deleted">A history entry says "(deleted)"</a></li>
+    <li><a href="#slow-scan">Entire Project scan is slow or the Editor stalls</a></li>
+    <li><a href="#quality">A translation reads oddly</a></li>
+  </ul>
+</div>
+
+<h2 id="stale-data">Something looks stale or out of date</h2>
+<p>
+  This is the single most common source of confusion across all three tools, and it's almost
+  always the same underlying cause: <strong>a window is showing you a cached snapshot, taken
+  the last time it actually read the project</strong> — not a live view that updates the moment
+  something changes elsewhere. It isn't a bug in Unity's repaint system; it's a deliberate
+  performance choice (re-reading everything on every frame would make a large project sluggish),
+  and each tool gives you an explicit way to force a fresh read:
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Where</th><th>What's cached</th><th>How to force a fresh read</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>StringFlow Tables (main window)</td>
+        <td>Its own <span class="ui">Scan</span> button deliberately reuses cached results for anything unchanged.</td>
+        <td>Press <span class="ui">Refresh</span> instead of <span class="ui">Scan</span> — see <a href="stringflow-tables.html#scan-vs-refresh">Scan vs. Refresh</a>.</td>
+      </tr>
+      <tr>
+        <td>Coverage, Find Duplicate Text, Find Unused Keys</td>
+        <td>All three read the main window's <strong>last scan results</strong> — they never scan on their own.</td>
+        <td>Run <span class="ui">Refresh</span> in the main window first, then reopen (or use each window's own <span class="ui">Refresh</span> where offered).</td>
+      </tr>
+      <tr>
+        <td>StringFlow Translate's table/locale/key list</td>
+        <td>Read once when the window opens, and cached from there.</td>
+        <td>Press its <span class="ui">Refresh</span> button — or close and reopen the window, which forces the same re-read.</td>
+      </tr>
+      <tr>
+        <td>StringFlow Languages</td>
+        <td>LibreTranslate's language list specifically is only as current as its <strong>last live Test this session</strong>.</td>
+        <td>Test the backend in StringFlow Translate — see <a href="#zero-languages">below</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  As a general rule: if you changed a table, translated something, or cleared values in
+  <em>one</em> window while another was already open showing the same data, the second window
+  won't notice on its own. Refresh it, or close and reopen it, before trusting what it shows.
+</p>
+
+<h2 id="port-conflict">Port conflict</h2>
+<p>
+  The backend's row names exactly what's holding the port — read that first. The single most
+  common cause, by platform:
+</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Platform</th><th>Usual cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>macOS</td>
+        <td><code>ControlCenter</code> — this is AirPlay Receiver, which has claimed port 5000 since Monterey.</td>
+        <td>Turn off <strong>System Settings ▸ General ▸ AirDrop &amp; Handoff ▸ AirPlay Receiver</strong>, or change the port instead (next column).</td>
+      </tr>
+      <tr>
+        <td>Any</td>
+        <td>Another dev server, or a leftover container from a previous session.</td>
+        <td>Close it, or in <strong>StringFlow Routing</strong> change the backend's URL to a free port, e.g. <code>http://localhost:5001</code>, then press <span class="ui">Check Again</span> in StringFlow Environment Setup.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  If you change the port, only the number before the colon in the URL changes — the server
+  still listens on the same port <em>inside</em> its container, StringFlow's default publish
+  mapping just changes which host port reaches it. Setting the URL is enough; nothing else
+  needs updating.
+</p>
+
+<h2 id="crash-loop">"Starts, crashes, and restarts over and over"</h2>
+<p>
+  This means Docker reports the container as running, but it's actually failing on every boot —
+  waiting longer will never fix it, and StringFlow says so instead of leaving you to wait out
+  its normal 45-minute timeout for nothing.
+</p>
+<ul>
+  <li>
+    <strong>If a <span class="ui">Repair</span> button is offered</strong>, the log pointed at
+    a half-finished model download — almost always caused by interrupting the very first setup
+    (closing Unity, sleeping the machine, or stopping the container while it was still
+    downloading). Press <span class="ui">Repair</span>; it removes only the files that never
+    finished and re-downloads just those. See
+    <a href="environment-setup.html#repair">Environment Setup — Repair</a>.
+  </li>
+  <li>
+    <strong>If not</strong>, open the Diagnostic Log at the bottom of StringFlow Environment
+    Setup for the container's actual error. Common causes: ran out of disk space mid-setup, or
+    a GPU variant selected on a machine without a working GPU passthrough (try the CPU variant
+    instead). If nothing there explains it, the surest fix is removing the container and
+    running <span class="ui">Set Up</span> again from scratch (stop it first from the
+    <span class="ui">⋯</span> menu).
+  </li>
+</ul>
+
+<h2 id="nllb-repair-restarts">Repair on NLLB just restarts it, without cleaning anything up</h2>
+<p>
+  This is expected, not a bug. Repair's surgical clean-up (removing only the model files that
+  never finished downloading) needs to know exactly where a backend keeps its downloaded model
+  data — LibreTranslate declares this, so Repair can be precise for it. NLLB doesn't declare a
+  model-data path the same way, so Repair has nothing safe to selectively delete and falls back
+  to a plain restart instead, rather than guessing at a path and risking a good model. If an
+  NLLB container is genuinely stuck, the fix is the same as any other crash-loop without a
+  Repair option: check the Diagnostic Log, and if nothing there explains it, remove the
+  container and run <span class="ui">Set Up</span> again from scratch.
+</p>
+
+<h2 id="gpu-not-used">GPU selected, but it doesn't seem to be using it</h2>
+<p>
+  A GPU-variant container that starts successfully but still translates slowly, or a container
+  that fails to start at all right after switching to <span class="ui">GPU</span>, both point
+  at the same thing: Docker's GPU passthrough isn't actually working on this machine. On
+  Windows this specifically needs Docker Desktop's WSL2 GPU support enabled with a supported
+  NVIDIA driver; on Linux it needs the NVIDIA Container Toolkit installed. Switching back to
+  <span class="ui">CPU</span> always works regardless of any of this — it's the portable
+  default for exactly this reason.
+</p>
+
+<h2 id="docker-not-found">Docker isn't ready, even though it's running</h2>
+<p>
+  Unity reads your system PATH once, when it launches. Docker installed <em>after</em> that —
+  or added to PATH by its own installer mid-session — can be genuinely invisible to an Editor
+  that's already open.
+</p>
+<ol class="steps">
+  <li><strong>Restart Unity.</strong> This alone fixes it most of the time.</li>
+  <li>
+    <strong>Still not found?</strong> In StringFlow Environment Setup's Docker section, use
+    <span class="ui">Locate docker myself…</span> and point directly at the
+    <code>docker</code> program (<code>docker.exe</code> on Windows). It's tested with
+    <code>--version</code> before being saved, so a wrong file is caught immediately rather
+    than failing later.
+  </li>
+</ol>
+
+<h2 id="docker-pull-blocked">A download or pull fails or hangs</h2>
+<p>
+  If Docker itself is confirmed running (green in StringFlow Environment Setup) but pulling or
+  building a specific backend fails or never progresses, the cause is almost always something
+  sitting between Docker and the internet, not StringFlow itself:
+</p>
+<ul>
+  <li><strong>Corporate firewall or proxy</strong> — Docker Hub and Hugging Face both need outbound HTTPS access; a network that blocks or intercepts that will show up here as a pull that hangs or fails with a TLS/certificate error.</li>
+  <li><strong>Antivirus scanning every layer</strong> — some antivirus products scan Docker's image layers as they're written, which can make a pull look stalled when it's actually just very slow. Give it time before assuming it's stuck.</li>
+  <li><strong>Disk space</strong> — a pull that fails partway through with no clear network error is worth checking against free disk space before anything else.</li>
+</ul>
+
+<h2 id="not-answering">Stuck on "not answering yet"</h2>
+<p>
+  Check the log line shown right under the status — it updates live. If it's genuinely moving
+  (different text a few seconds later), it's still downloading or loading; this is normal on a
+  first run and can take 20–30 minutes. If the line hasn't changed in several minutes and looks
+  like an error rather than progress, open the Diagnostic Log for the full picture, or try
+  <span class="ui">Check Again</span> to force an immediate re-read of the container's log.
+</p>
+
+<h2 id="menu-missing">Only StringFlow Tables shows up under Tools ▸ StringFlow</h2>
+<p>
+  Unity's own <strong>Localization package</strong> isn't installed. StringFlow Translate and
+  StringFlow Environment Setup both require it and simply don't compile without it — which is
+  deliberate: rather than a wall of compile errors in your console, those two menu items just
+  don't appear, and you'll see one warning in the console the first time you open the project
+  explaining why. Install it via <span class="path">Window ▸ Package Manager ▸ Unity
+  Registry ▸ search "Localization" ▸ Install</span>; the menus appear on their own once Unity
+  finishes recompiling. StringFlow Tables doesn't need this package and works either way.
+</p>
+
+<h2 id="language-missing">A language isn't in the list</h2>
+<p>
+  Open <strong>StringFlow Languages</strong> (from the button in StringFlow Translate) to see
+  exactly what the currently running server(s) support. A locale missing from that list is
+  skipped for that backend rather than causing a failure — if you have more than one backend
+  enabled, StringFlow tries the next one automatically. Adding a new Locale to your Unity
+  project later needs no re-setup on the server side; if the server already covers that
+  language, it just works the next time you translate.
+</p>
+
+<h2 id="zero-languages">StringFlow Languages shows 0 languages for LibreTranslate</h2>
+<p>
+  This doesn't mean the server has no languages — it means <strong>LibreTranslate hasn't been
+  tested this Editor session yet</strong>. Unlike every other backend (whose languages come from
+  a static map), LibreTranslate's list is discovered live, and StringFlow Languages only ever
+  reads whatever the last live test found; it never makes a network call of its own. Go to
+  StringFlow Translate and press <span class="ui">Test All</span> (or test that one backend
+  directly), then reopen StringFlow Languages.
+</p>
+
+<h2 id="nothing-happened">Translate ran, but nothing changed</h2>
+<p>
+  Every target cell in scope was already filled — StringFlow Translate only ever writes to
+  <em>empty</em> cells, by design (see
+  <a href="stringflow-translate.html#running">StringFlow Translate</a>). A dialog says so
+  explicitly ("Nothing to translate — all applicable cells are already filled") rather than
+  silently doing nothing, so if you saw that message, this is confirmed, not a guess. Switch to
+  <span class="ui">Selected Missing</span> with specific keys checked to confirm exactly what's
+  outstanding, or use StringFlow Tables' <a href="stringflow-tables.html#coverage">Coverage</a>
+  view to see the gaps directly. And if you expected a cell to be re-translated rather than
+  filled for the first time, remember it needs to be genuinely empty first — see
+  <a href="stringflow-tables.html#clear">Clear Values</a>.
+</p>
+
+<h2 id="same-locale">"Source and target are the same locale"</h2>
+<p>
+  Shown when <span class="ui">Source Language</span> and <span class="ui">Target Language</span>
+  resolve to the same locale for the current selection — there's nothing to translate by
+  definition. This most often happens with <span class="ui">Auto</span> source resolution on a
+  table where a key's only non-empty value happens to be in the same locale you've picked as the
+  target. Pick an explicit, different source locale, or check which locale actually has content
+  for the affected keys.
+</p>
+
+<h2 id="recompile-interrupt">A run stopped partway through on its own</h2>
+<p>
+  Closing StringFlow Translate's window mid-run is treated as an implicit cancel — whatever
+  already completed is kept, exactly like pressing <span class="ui">Cancel</span> yourself. The
+  most common way this happens by surprise is a <strong>script recompile</strong>: editing and
+  saving a C# script while a long translation run is in progress reloads the Editor's scripting
+  domain, which closes the window's live state along with it. If you're about to kick off a
+  large run, avoid triggering a recompile until it's done — or just re-run it afterward, since
+  StringFlow Translate only fills empty cells, picking back up exactly where it left off costs
+  nothing.
+</p>
+
+<h2 id="no-bind-button">Bind / Change Table button isn't there for a row</h2>
+<p>
+  These are status-specific by design: <span class="ui">Bind</span> only appears for
+  <strong>Unlocalized</strong> rows, and <span class="ui">Change Table</span> only for rows that
+  are already bound to something (any status other than Unlocalized). If neither shows up,
+  check the row's actual status first — a <strong>Missing Key</strong> or
+  <strong>Broken Binding</strong> row gets a <a href="stringflow-tables.html#repair">Repair</a>
+  section instead, since "bind" and "fix an existing broken binding" are different operations
+  with different safe defaults.
+</p>
+
+<h2 id="unused-wrong">Unused Keys (or Coverage) looks wrong</h2>
+<p>
+  Both windows read the main window's <strong>most recent scan</strong>, not a fresh scan of
+  their own — see <a href="#stale-data">Something looks stale or out of date</a> above. If that
+  scan was a narrow scope like <span class="ui">Current Scene</span>, a key used only elsewhere
+  in the project will show as unused (or coverage will look worse than it really is) even
+  though it's genuinely fine. Run a scan with <span class="ui">Entire Project</span> in the main
+  window first, then reopen whichever of these you were looking at.
+</p>
+
+<h2 id="not-undoable">Ctrl+Z didn't undo something</h2>
+<p>
+  Almost everything in StringFlow Tables is undoable — Bind, Unbind, Change Table, Merge Keys,
+  Delete Unused Keys, Clear Values all go through Unity's normal Undo system. The one deliberate
+  exception: any write that lands on a <strong>prefab asset directly</strong> (not a scene
+  instance of one) — most commonly "Match Prefab Binding" on a prefab override, or a Bind/Change
+  Table/Repair batch that happens to include prefab-asset objects. The Preview window always
+  warns you before you apply anything that includes one of these, specifically because it's the
+  one case Ctrl+Z can't undo — if you saw that warning and clicked Apply anyway, that's why.
+</p>
+
+<h2 id="history-deleted">A history entry says "(deleted)"</h2>
+<p>
+  This is StringFlow History being honest about a key or table that no longer exists, rather
+  than silently dropping the record or crashing. History identifies entries by stable internal
+  IDs, not by name, so renaming a table, key, or locale never breaks anything here — only
+  actual deletion does, and even then the historical record of what was translated, when, and
+  by which backend is kept; it just can't be pinged open in the Table window any more.
+</p>
+
+<h2 id="slow-scan">Entire Project scan is slow, or the Editor feels unresponsive</h2>
+<p>
+  Scanning every scene and prefab in a large project is genuinely more work than scanning one
+  scene, and it's the slowest option on purpose — it trades speed for completeness. The results
+  list itself stays responsive regardless of size (only visible rows are actually drawn), so if
+  the Editor seems to hang, it's most likely mid-scan rather than stuck; a progress bar with its
+  own <span class="ui">Cancel</span> is shown for exactly this. For routine iteration, prefer
+  <span class="ui">Current Scene</span> or <span class="ui">Selected Prefabs</span> and save
+  <span class="ui">Entire Project</span> for before a translation pass or a release.
+</p>
+
+<h2 id="quality">A translation reads oddly</h2>
+<p>
+  Check its tag in the table. <strong>Translated via segment fallback</strong> (shown as
+  <strong>Filled, needs review</strong> in StringFlow Translate's key list) means the string had
+  to be split and reassembled — usually because of placeholders or Rich Text tags in the middle
+  of the sentence — and is the kind of result worth a native speaker's review before it ships.
+  Machine translation in general is a first pass, not a final one; treat anything player-facing
+  as a draft until a human has looked at it.
+</p>
+
+<div class="page-nav">
+  <a href="licensing.html"><span class="dir">&larr; Previous</span><span class="label">Licensing</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

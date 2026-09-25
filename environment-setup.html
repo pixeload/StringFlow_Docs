@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StringFlow Environment Setup — StringFlow Documentation</title>
+<meta name="description" content="Install and manage the local translation servers StringFlow Translate uses.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<input type="checkbox" id="nav-check" style="display:none">
+<label for="nav-check" class="sidebar-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span>StringFlow Docs</span>
+</label>
+<div class="shell">
+  <nav class="sidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><img src="assets/logo.png" alt="StringFlow logo"></span>
+      <span class="brand-name">StringFlow</span>
+    </a>
+    <p class="sidebar-tagline">Localization tools for Unity</p>
+      <div class="nav-group">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <ul>
+          <li><a href="introduction.html">Introduction</a></li>
+          <li><a href="getting-started.html">Getting Started</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">The three tools</div>
+        <ul>
+          <li><a href="stringflow-tables.html">StringFlow Tables</a></li>
+          <li><a href="stringflow-translate.html">StringFlow Translate</a></li>
+          <li><a href="environment-setup.html" class="current">StringFlow Environment Setup</a></li>
+        </ul>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Going further</div>
+        <ul>
+          <li><a href="manual-setup.html">Manual Setup (no wizard)</a></li>
+          <li><a href="connecting-backends.html">Connecting Custom Backends</a></li>
+          <li><a href="licensing.html">Licensing &amp; Third-Party Notices</a></li>
+          <li><a href="troubleshooting.html">Troubleshooting</a></li>
+        </ul>
+      </div>
+  </nav>
+  <div class="main">
+    <div class="content">
+<div class="content-header">
+  <p class="eyebrow">The Three Tools</p>
+  <h1>StringFlow Environment Setup</h1>
+  <p class="lede">
+    Installs and manages the local translation server(s) that StringFlow Translate uses.
+    Everything it does runs through Docker, on your own machine — it never sends your project
+    anywhere, and it never installs or starts Docker itself.
+  </p>
+</div>
+
+<p>Open it from <span class="path">Tools ▸ StringFlow ▸ StringFlow Environment Setup</span>.</p>
+
+<div class="on-this-page">
+  <p class="callout-label">On this page</p>
+  <ul>
+    <li><a href="#wizard">Running the setup wizard</a></li>
+    <li><a href="#statuses">Reading a backend's status</a></li>
+    <li><a href="#actions">The backend row's actions</a></li>
+    <li><a href="#gpu-cpu">CPU vs. GPU</a></li>
+    <li><a href="#repair">Repair</a></li>
+    <li><a href="#nllb">Enabling NLLB</a></li>
+    <li><a href="#dashboard">The dashboard, once everything's set up</a></li>
+    <li><a href="#log">The Diagnostic Log</a></li>
+    <li><a href="#day-two">Coming back later</a></li>
+  </ul>
+</div>
+
+<h2 id="wizard">Running the setup wizard</h2>
+<p>Press <span class="ui">Start Setup</span>. It walks a fixed sequence, one stage at a time:</p>
+<ol class="steps">
+  <li>
+    <strong>Docker.</strong>
+    Checks that Docker Desktop is installed and running. If it isn't, you get a numbered set of
+    steps for your platform and an <span class="ui">I've done that — Check Again</span>
+    button — the wizard waits here rather than failing outright.
+  </li>
+  <li>
+    <strong>Each engine, one at a time.</strong>
+    For each engine you're setting up, the wizard describes what installing it involves
+    (roughly how much it downloads, what it covers) and asks
+    <span class="ui">Set Up &lt;name&gt;</span> or <span class="ui">Skip This One</span> — it
+    never downloads anything without that explicit choice.
+  </li>
+  <li>
+    <strong>Waiting out the first-run download.</strong>
+    A container can be "up" in Docker's sense while it's still fetching its language models —
+    that first download takes real time (LibreTranslate: ~20–30 minutes for its full ~50-language
+    set). The row shows live status and the container's own latest log line the whole time.
+  </li>
+</ol>
+<div class="callout warn">
+  <p class="callout-label">⚠ Let the first download finish</p>
+  <p>
+    Quitting Unity, sleeping the machine, or stopping the container mid-download can leave a
+    half-written model file behind — which stops the server from starting at all, permanently,
+    since the downloaded files live in a Docker volume that outlives the container. If that
+    happens, <a href="#repair">Repair</a> fixes it without losing what did finish downloading.
+  </p>
+</div>
+
+<h2 id="statuses">Reading a backend's status</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Dot</th><th>Status</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot g">✓</span></td><td><strong>Ready</strong></td><td>Running and answering. StringFlow Translate can use it.</td></tr>
+      <tr><td><span class="dot a">⚠</span></td><td><strong>Not answering yet</strong></td><td>Container is up but hasn't responded — its log was checked and shows no sign of a crash, so it's genuinely still starting (usually still downloading models). The row shows the latest log line as live progress.</td></tr>
+      <tr><td><span class="dot a">⚠</span></td><td><strong>Stopped</strong></td><td>Installed, but the container isn't running. Press <span class="ui">Start</span>.</td></tr>
+      <tr><td><span class="dot b">⟳</span></td><td><strong>Checking…</strong></td><td>Looking at Docker and the server right now — a few seconds, not a state you'll see for long.</td></tr>
+      <tr><td><span class="dot r">✗</span></td><td><strong>Not set up</strong></td><td>Nothing installed yet. Press <span class="ui">Set Up</span>.</td></tr>
+      <tr><td><span class="dot r">✗</span></td><td><strong>Error</strong></td><td>Something is genuinely wrong and the row names it — this is never a "just wait" state. See <a href="troubleshooting.html">Troubleshooting</a>.</td></tr>
+      <tr><td><span class="dot a">⚠</span></td><td><strong>Port conflict</strong></td><td>Something else on your machine already holds the port this backend wants. The row names the process. See <a href="troubleshooting.html#port-conflict">Troubleshooting</a>.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="actions">The backend row's actions</h2>
+<p>
+  Each backend gets one card with one primary button — whatever's actually relevant right now
+  — plus a <span class="ui">⋯</span> menu for the rest: <span class="ui">Check Again</span>,
+  <span class="ui">Start</span> / <span class="ui">Stop</span> / <span class="ui">Restart</span>,
+  <span class="ui">Repair</span>, <span class="ui">Open in Browser</span>, and
+  <span class="ui">Enable</span> / <span class="ui">Disable for Translator</span>.
+</p>
+<p>
+  If a backend is already answering under the URL you've configured — however it was
+  started, by this tool or by hand — it's treated as <strong>Ready</strong> immediately.
+  StringFlow never reinstalls over the top of something that's already working, and if it
+  finds a container it didn't create sitting on the right port, it adopts and manages that one
+  instead of creating a duplicate.
+</p>
+
+<h2 id="gpu-cpu">CPU vs. GPU</h2>
+<p>
+  A backend that offers a GPU-accelerated build (NLLB does) shows a <span class="ui">CPU</span> /
+  <span class="ui">GPU</span> dropdown next to its card. CPU is the safe, portable default — it
+  works on any machine Docker runs on, Apple Silicon and ARM included. GPU needs an NVIDIA GPU
+  and Docker's GPU passthrough working (on Windows, that means Docker Desktop's WSL2 GPU
+  support) — pick it only if you know that's set up, since a GPU build on a machine without
+  working passthrough will fail to start rather than silently fall back to CPU.
+</p>
+
+<h2 id="repair">Repair</h2>
+<p>
+  When a server is crash-looping in a way that looks like a half-finished model download,
+  the row's error explains that plainly and offers a <span class="ui">Repair</span> button —
+  in place of the normal primary action, and also in the <span class="ui">⋯</span> menu.
+  Repair:
+</p>
+<ol class="steps">
+  <li><strong>Stops the container.</strong></li>
+  <li>
+    <strong>Deletes only what's provably incomplete.</strong>
+    It scans the server's model-data folder in a disposable helper container and removes any
+    model directory containing a zero-byte file — the exact signature of a download that was
+    cut off. Every model that finished downloading completely is left untouched.
+  </li>
+  <li><strong>Starts the container again</strong>, which re-downloads only what was removed.</li>
+</ol>
+<p>
+  Nothing about Repair is guesswork: it only ever removes files that are unusable by
+  definition, never anything that could still be good.
+</p>
+
+<h2 id="nllb">Enabling NLLB</h2>
+<p>
+  NLLB is StringFlow's optional second engine — broader language coverage, at the cost of a
+  much heavier setup. It's <strong>disabled by default</strong> and gated behind a licence
+  notice: its model is released under a non-commercial licence, and the tool won't let you
+  install it until you've read that notice and ticked the box confirming you understand it.
+  See <a href="licensing.html#nllb">Licensing — NLLB</a> before enabling it on a commercial
+  project.
+</p>
+
+<h2 id="dashboard">The dashboard, once everything's set up</h2>
+<p>
+  This same window doubles as the day-two view once setup has run at least once — the
+  step-by-step wizard hands off to a compact dashboard rather than showing you a finished
+  checklist every time you open it:
+</p>
+<ul>
+  <li>
+    <strong>A one-line Docker status</strong> at the top — a green check, or a red cross with
+    its own <span class="ui">Fix This</span> button that re-runs the same wizard flow from the
+    top if Docker stops being available.
+  </li>
+  <li><strong>One card per backend</strong> — exactly the same cards and actions described above.</li>
+  <li>
+    <strong>Restore the engines that ship with this package</strong> — appears only if your
+    backend list is missing one of StringFlow's own default engines (deleted from
+    <a href="stringflow-translate.html#routing">StringFlow Routing</a>, say). Puts back whatever's
+    missing, exactly as shipped, without touching anything still in your list — so a
+    custom backend you added yourself is never affected.
+  </li>
+  <li>
+    <strong>Run Setup Again</strong> — re-enters the same wizard flow. Safe to press any time;
+    see <a href="#day-two">Coming back later</a> below for why.
+  </li>
+</ul>
+
+<h2 id="log">The Diagnostic Log</h2>
+<p>
+  A collapsible, timestamped log at the bottom of the window — every check, install, start,
+  stop, and repair step this tool has ever run appends a line here, tagged with which backend
+  it was about, so a failure can be traced back through everything that actually happened
+  rather than just the last status line you can see. <span class="ui">Copy</span> puts the
+  whole thing on your clipboard (useful for reporting an issue); <span class="ui">Clear</span>
+  empties it. This is the first place to look when a wizard step or a backend fails for a
+  reason its own status text doesn't fully explain.
+</p>
+
+<h2 id="day-two">Coming back later</h2>
+<p>
+  <span class="ui">Start Setup</span> (or <span class="ui">Run Setup Again</span> from the
+  dashboard) is safe to run any time — it's idempotent. Anything already
+  <strong>Ready</strong> is skipped straight through with no prompt, anything merely
+  <strong>Stopped</strong> is started with no prompt, and nothing already downloaded or built
+  is ever fetched a second time. It's also what a returning user needs after a restart:
+  containers with a restart policy come back on their own once Docker Desktop is running, so
+  most of the time this just confirms everything's already fine.
+</p>
+
+<div class="page-nav">
+  <a href="stringflow-translate.html"><span class="dir">&larr; Previous</span><span class="label">StringFlow Translate</span></a>
+  <a href="manual-setup.html" class="next"><span class="dir">Next &rarr;</span><span class="label">Manual Setup</span></a>
+</div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
